@@ -45,25 +45,36 @@
   </select>
 
   <button onclick="resizeAndChangeBG()">🔧 Proses Gambar</button>
-  <a id="downloadLink" style="display:none;" download="hasil.png">📥 Unduh Gambar</a>
+  <a id="downloadLink" style="display:none; margin-top:10px;" download="hasil.png">📥 Unduh Gambar</a>
 
   <canvas id="canvas"></canvas>
 
   <script>
-    let image = new Image();
+    let uploadedImage = null;
 
     document.getElementById('upload').addEventListener('change', function(e) {
       const reader = new FileReader();
       reader.onload = function(event) {
-        image.src = event.target.result;
+        uploadedImage = new Image();
+        uploadedImage.onload = () => {
+          drawImage();
+        }
+        uploadedImage.src = event.target.result;
       }
       reader.readAsDataURL(e.target.files[0]);
     });
 
     function resizeAndChangeBG() {
+      if (!uploadedImage) {
+        alert("Silakan unggah gambar terlebih dahulu.");
+        return;
+      }
+      drawImage();
+    }
+
+    function drawImage() {
       const canvas = document.getElementById('canvas');
       const ctx = canvas.getContext('2d');
-
       const width = parseInt(document.getElementById('width').value);
       const height = parseInt(document.getElementById('height').value);
       const bgColor = document.getElementById('bg').value;
@@ -73,31 +84,23 @@
         return;
       }
 
-      image.onload = () => {
-        canvas.width = width;
-        canvas.height = height;
+      canvas.width = width;
+      canvas.height = height;
 
-        if (bgColor !== 'transparent') {
-          ctx.fillStyle = bgColor;
-          ctx.fillRect(0, 0, width, height);
-        } else {
-          ctx.clearRect(0, 0, width, height);
-        }
-
-        ctx.drawImage(image, 0, 0, width, height);
-
-        const link = document.getElementById('downloadLink');
-        link.href = canvas.toDataURL("image/png");
-        link.style.display = 'block';
+      if (bgColor !== 'transparent') {
+        ctx.fillStyle = bgColor;
+        ctx.fillRect(0, 0, width, height);
+      } else {
+        ctx.clearRect(0, 0, width, height);
       }
 
-      // trigger ulang load jika gambar sudah di-set sebelumnya
-      if (image.src) {
-        const tempSrc = image.src;
-        image.src = "";
-        image.src = tempSrc;
-      }
+      ctx.drawImage(uploadedImage, 0, 0, width, height);
+
+      const link = document.getElementById('downloadLink');
+      link.href = canvas.toDataURL("image/png");
+      link.style.display = 'inline-block';
     }
   </script>
 </body>
 </html>
+
