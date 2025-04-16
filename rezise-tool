@@ -73,24 +73,30 @@
         return;
       }
 
-      canvas.width = width;
-      canvas.height = height;
-
-      if (bgColor !== 'transparent') {
-        ctx.fillStyle = bgColor;
-        ctx.fillRect(0, 0, width, height);
-      } else {
-        ctx.clearRect(0, 0, width, height);
-      }
-
       image.onload = () => {
-        ctx.drawImage(image, 0, 0, width, height);
-      }
-      ctx.drawImage(image, 0, 0, width, height);
+        canvas.width = width;
+        canvas.height = height;
 
-      const link = document.getElementById('downloadLink');
-      link.href = canvas.toDataURL("image/png");
-      link.style.display = 'block';
+        if (bgColor !== 'transparent') {
+          ctx.fillStyle = bgColor;
+          ctx.fillRect(0, 0, width, height);
+        } else {
+          ctx.clearRect(0, 0, width, height);
+        }
+
+        ctx.drawImage(image, 0, 0, width, height);
+
+        const link = document.getElementById('downloadLink');
+        link.href = canvas.toDataURL("image/png");
+        link.style.display = 'block';
+      }
+
+      // trigger ulang load jika gambar sudah di-set sebelumnya
+      if (image.src) {
+        const tempSrc = image.src;
+        image.src = "";
+        image.src = tempSrc;
+      }
     }
   </script>
 </body>
