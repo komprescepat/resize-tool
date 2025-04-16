@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ubah Ukuran & Background Foto</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+    }
+    h2 {
+      color: #0d6efd;
+    }
+    label, input, select, button {
+      display: block;
+      margin-bottom: 10px;
+    }
+    canvas {
+      max-width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Ubah Ukuran & Ganti Background Foto</h2>
+  <input type="file" id="upload" accept="image/*">
+
+  <label for="width">Lebar (px):</label>
+  <input type="number" id="width" placeholder="Contoh: 800">
+
+  <label for="height">Tinggi (px):</label>
+  <input type="number" id="height" placeholder="Contoh: 600">
+
+  <label for="bg">Warna Background:</label>
+  <select id="bg">
+    <option value="transparent">Transparan</option>
+    <option value="white">Putih</option>
+    <option value="red">Merah</option>
+    <option value="blue">Biru</option>
+  </select>
+
+  <button onclick="resizeAndChangeBG()">🔧 Proses Gambar</button>
+  <a id="downloadLink" style="display:none;" download="hasil.png">📥 Unduh Gambar</a>
+
+  <canvas id="canvas"></canvas>
+
+  <script>
+    let image = new Image();
+
+    document.getElementById('upload').addEventListener('change', function(e) {
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        image.src = event.target.result;
+      }
+      reader.readAsDataURL(e.target.files[0]);
+    });
+
+    function resizeAndChangeBG() {
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+
+      const width = parseInt(document.getElementById('width').value);
+      const height = parseInt(document.getElementById('height').value);
+      const bgColor = document.getElementById('bg').value;
+
+      if (!width || !height) {
+        alert("Masukkan ukuran lebar dan tinggi yang valid!");
+        return;
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+
+      if (bgColor !== 'transparent') {
+        ctx.fillStyle = bgColor;
+        ctx.fillRect(0, 0, width, height);
+      } else {
+        ctx.clearRect(0, 0, width, height);
+      }
+
+      image.onload = () => {
+        ctx.drawImage(image, 0, 0, width, height);
+      }
+      ctx.drawImage(image, 0, 0, width, height);
+
+      const link = document.getElementById('downloadLink');
+      link.href = canvas.toDataURL("image/png");
+      link.style.display = 'block';
+    }
+  </script>
+</body>
+</html>
