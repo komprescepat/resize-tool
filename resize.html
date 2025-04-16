@@ -1,0 +1,77 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ubah Ukuran & Ganti Background Foto - KompresCepat</title>
+  <style>
+    body { font-family: sans-serif; max-width: 800px; margin: auto; padding: 20px; }
+    h2 { color: #0d6efd; }
+    input, select, button { margin: 5px 0; padding: 8px; font-size: 16px; }
+    canvas { max-width: 100%; margin-top: 15px; border: 1px solid #ccc; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <h2>Ubah Ukuran & Ganti Background Foto</h2>
+  <p>Unggah gambar Anda (PNG/JPG), atur ukuran baru, dan pilih warna latar belakang:</p>
+  <input type="file" id="imgInput" accept="image/*"><br>
+  <label>Lebar (px): <input type="number" id="width" value="500"></label><br>
+  <label>Tinggi (px): <input type="number" id="height" value="500"></label><br>
+  <label>Warna Latar: 
+    <select id="bgColor">
+      <option value="transparent">Transparan</option>
+      <option value="white">Putih</option>
+      <option value="red">Merah</option>
+      <option value="blue">Biru</option>
+    </select>
+  </label><br>
+  <button onclick="processImage()">Proses</button>
+  <div id="preview">
+    <canvas id="canvas"></canvas><br>
+    <a id="download" style="display:none;" download="hasil.png">📥 Unduh Gambar</a>
+  </div>
+
+<script>
+function processImage() {
+  const file = document.getElementById('imgInput').files[0];
+  const width = parseInt(document.getElementById('width').value);
+  const height = parseInt(document.getElementById('height').value);
+  const bgColor = document.getElementById('bgColor').value;
+
+  if (!file) return alert("Pilih gambar terlebih dahulu!");
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = width;
+      canvas.height = height;
+
+      if (bgColor !== "transparent") {
+        ctx.fillStyle = bgColor;
+        ctx.fillRect(0, 0, width, height);
+      } else {
+        ctx.clearRect(0, 0, width, height);
+      }
+
+      const ratio = Math.min(width / img.width, height / img.height);
+      const newWidth = img.width * ratio;
+      const newHeight = img.height * ratio;
+      const x = (width - newWidth) / 2;
+      const y = (height - newHeight) / 2;
+      ctx.drawImage(img, x, y, newWidth, newHeight);
+
+      const dl = document.getElementById('download');
+      dl.href = canvas.toDataURL();
+      dl.style.display = "inline-block";
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+</script>
+</body>
+</html>
